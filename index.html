@@ -4,41 +4,86 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ควบคุมอุปกรณ์</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       padding: 0;
       font-family: 'Sarabun', sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: #f2f4f7;
+      color: #333;
     }
 
     .container {
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      text-align: center;
+      max-width: 500px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+      padding: 30px 20px;
     }
 
     h2 {
-      margin-bottom: 30px;
-      color: #333;
+      text-align: center;
       font-weight: 600;
+      font-size: 22px;
+      margin-bottom: 30px;
+      color: #2e7d32;
+    }
+
+    .device-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+
+    .device-box:hover {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .device-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-label {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .onText {
+      color: #388e3c;
+    }
+
+    .offText {
+      color: #d32f2f;
     }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 70px;
-      height: 38px;
-      margin-bottom: 20px;
+      width: 60px;
+      height: 34px;
     }
 
     .switch input {
@@ -50,17 +95,20 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background-color: #ccc;
       transition: 0.4s;
-      border-radius: 38px;
+      border-radius: 34px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 30px;
-      width: 30px;
+      height: 26px;
+      width: 26px;
       left: 4px;
       bottom: 4px;
       background-color: white;
@@ -73,72 +121,135 @@
     }
 
     input:checked + .slider:before {
-      transform: translateX(32px);
+      transform: translateX(26px);
     }
 
-    #statusText {
-      font-size: 22px;
-      font-weight: bold;
-      color: #444;
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
-    .onText {
-      color: #4caf50;
+    button:hover {
+      background-color: #1976d2;
     }
 
-    .offText {
-      color: #f44336;
+    @media screen and (max-width: 600px) {
+      .container {
+        margin: 20px;
+        padding: 20px 15px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .device-title {
+        font-size: 16px;
+      }
+
+      .status-label {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h2>ควบคุมสถานะอุปกรณ์</h2>
-    <label class="switch">
-      <input type="checkbox" id="toggleSwitch" onchange="updateStatus(this.checked)">
-      <span class="slider"></span>
-    </label>
-    <div id="statusText">กำลังโหลด...</div>
+    <h2><span class="material-icons">devices</span> ควบคุมอุปกรณ์</h2>
+
+    <!-- อุปกรณ์ 1 -->
+    <div class="device-box">
+      <div class="device-title">
+        <span class="material-icons">lightbulb</span> อุปกรณ์ 1 (โคมไฟ)
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggleSwitch1" onchange="updateStatus('status', this.checked)">
+        <span class="slider"></span>
+      </label>
+      <div id="statusText1" class="status-label">กำลังโหลด...</div>
+    </div>
+
+    <!-- อุปกรณ์ 2 -->
+    <div class="device-box">
+      <div class="device-title">
+        <span class="material-icons">power</span> อุปกรณ์ 2 (ปลั๊กไฟ)
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggleSwitch2" onchange="updateStatus('status2', this.checked)">
+        <span class="slider"></span>
+      </label>
+      <div id="statusText2" class="status-label">กำลังโหลด...</div>
+    </div>
+
+    <!-- ปุ่มทดสอบ -->
+    <button onclick="testButton()">
+      <span class="material-icons" style="vertical-align: middle;">play_arrow</span> ทดสอบการทำงาน
+    </button>
   </div>
 
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBZvfxj3PDYMrNyAnGp-asioEfoKH4ddxM",
-        authDomain: "homero-16677.firebaseapp.com",
-        projectId: "homero-16677",
-        storageBucket: "homero-16677.firebasestorage.app",
-        messagingSenderId: "108007303810",
-        appId: "1:108007303810:web:16fb7d1054bee995fc229b",
-        measurementId: "G-QW232DQHH5"
+      authDomain: "homero-16677.firebaseapp.com",
+      projectId: "homero-16677",
+      storageBucket: "homero-16677.firebasestorage.app",
+      messagingSenderId: "108007303810",
+      appId: "1:108007303810:web:16fb7d1054bee995fc229b",
+      measurementId: "G-QW232DQHH5"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const docRef = db.collection("devices").doc("device1");
 
-    const toggleSwitch = document.getElementById("toggleSwitch");
-    const statusText = document.getElementById("statusText");
+    const toggle1 = document.getElementById("toggleSwitch1");
+    const toggle2 = document.getElementById("toggleSwitch2");
+    const text1 = document.getElementById("statusText1");
+    const text2 = document.getElementById("statusText2");
 
-    function updateStatusText(isOn) {
-      statusText.textContent = isOn ? "สถานะ: เปิด ✅" : "สถานะ: ปิด ⛔";
-      statusText.className = isOn ? "onText" : "offText";
+    function updateStatusText(element, value) {
+      element.textContent = value ? "สถานะ: เปิด ✅" : "สถานะ: ปิด ⛔";
+      element.className = value ? "status-label onText" : "status-label offText";
     }
 
-    db.collection("devices").doc("device1").get().then((doc) => {
+    // โหลดข้อมูลเริ่มต้น
+    docRef.get().then((doc) => {
       if (doc.exists) {
-        const isOn = doc.data().status === 1;
-        toggleSwitch.checked = isOn;
-        updateStatusText(isOn);
+        const data = doc.data();
+        const s1 = data.status === 1;
+        const s2 = data.status2 === 1;
+
+        toggle1.checked = s1;
+        toggle2.checked = s2;
+
+        updateStatusText(text1, s1);
+        updateStatusText(text2, s2);
       } else {
-        statusText.textContent = "ไม่พบข้อมูลอุปกรณ์";
+        text1.textContent = "ไม่พบข้อมูลอุปกรณ์";
+        text2.textContent = "ไม่พบข้อมูลอุปกรณ์";
       }
     });
 
-    function updateStatus(isOn) {
+    // อัปเดตสถานะ
+    function updateStatus(field, isOn) {
       const value = isOn ? 1 : 0;
-      db.collection("devices").doc("device1").set({ status: value })
-        .then(() => {
-          updateStatusText(isOn);
-        });
+      docRef.update({ [field]: value }).then(() => {
+        if (field === 'status') updateStatusText(text1, isOn);
+        if (field === 'status2') updateStatusText(text2, isOn);
+      });
+    }
+
+    function testButton() {
+      alert("ทดสอบเรียบร้อยแล้ว 🎉");
+      console.log("คลิกทดสอบการทำงาน");
     }
   </script>
 </body>
